@@ -16,11 +16,11 @@
 #define NEWFILE (O_WRONLY|O_CREAT|O_TRUNC)
 #define MYTCP_PORT 4950
 #define MYUDP_PORT 5350
-#define DATALEN 500 // Alternate between 200 and 1400 bytes
+#define DATALEN 1000 // Alternate between 200 and 1400 bytes
 #define BUFSIZE 60000
 #define PACKLEN (DATALEN + HEADLEN)
 #define HEADLEN 8
-#define ERROR_PROBABILITY 0.1 // Alternate between 0.0 and 0.40
+#define ERROR_PROBABILITY 0.0 // Alternate between 0.0 and 0.40
 
 struct pack_so			//data packet structure
 {
