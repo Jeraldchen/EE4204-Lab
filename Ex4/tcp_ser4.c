@@ -79,23 +79,25 @@ void str_ser(int sockfd)
 	end = 0;
     int random_num = 0;
 	srand(time(0));
+	int packet_num = 0;
 
 	printf("receiving data!\n");
 
 
 	while(!end)
 	{
+		packet_num++;
         random_num = rand() % 1000; // random number between 0 and 999
         int error_range = (int)(ERROR_PROBABILITY * 1000);
         if (random_num < error_range) {                                                           // assume error / corrupt packet
-            ack.num = -1; // nack
+            ack.num = 2; // nack
             ack.len = 0;
             if ((n = send(sockfd, &ack, 2, 0))==-1)
             {
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("NACK sent by server to client\n");
+            printf("NACK sent by server to client, packet %d\n", packet_num);
         } 
 
         else 
@@ -113,7 +115,7 @@ void str_ser(int sockfd)
             memcpy((buf+lseek), recvs, n); // receive the uncorrupt packet and store in dest
             lseek += n;
 
-            // for stop and wait ARQ, receiver (server) sends ack after successfully receiving each packet
+            // for stop and wait ARQ, receiver (server) sends ack after successfully receiving each frame
             ack.num = 1; 
             ack.len = 0;
             if ((n = send(sockfd, &ack, 2, 0))==-1)
@@ -121,7 +123,7 @@ void str_ser(int sockfd)
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("ACK sent by server to client\n");
+            printf("ACK sent by server to client, packet %d\n", packet_num);
         }
 	}
 	
