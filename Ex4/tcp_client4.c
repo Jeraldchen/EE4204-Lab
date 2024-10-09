@@ -85,10 +85,7 @@ float str_cli(FILE *fp, int sockfd, long *len)
 	float time_inv = 0.0;
 	struct timeval sendt, recvt;
 	ci = 0;
-
-	struct ack_so termination_packet;
-	termination_packet.num = 3; // Use a special number to signify termination
-	termination_packet.len = 0; // No data, just the flag
+	int packet_count = 0;
 
 	fseek (fp , 0 , SEEK_END);
 	lsize = ftell (fp);
@@ -120,6 +117,8 @@ float str_cli(FILE *fp, int sockfd, long *len)
 			printf("send error!");								
 			exit(1);
 		}
+		packet_count++;
+		printf("Packet %d sent\n", packet_count);
 
 		if ((n= recv(sockfd, &ack, 2, 0))==-1)                                   //receive the ack
 		{

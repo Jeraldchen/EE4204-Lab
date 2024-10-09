@@ -78,6 +78,7 @@ void str_ser(int sockfd)
 	long lseek=0;
 	end = 0;
     int random_num = 0;
+	int ACK_count = 0;
 	srand(time(0));
 
 	printf("receiving data!\n");
@@ -106,6 +107,8 @@ void str_ser(int sockfd)
                 exit(1);
             }
 
+			ACK_count++;
+
             if (recvs[n-1] == '\0')									//if it is the end of the file
             {
                 end = 1;
@@ -121,7 +124,7 @@ void str_ser(int sockfd)
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("ACK sent by server to client\n");
+            printf("ACK sent by server to client, %d\n", ACK_count);
         }
 	}
 	
