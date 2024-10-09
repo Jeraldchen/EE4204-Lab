@@ -79,14 +79,12 @@ void str_ser(int sockfd)
 	end = 0;
     int random_num = 0;
 	srand(time(0));
-	int packet_num = 0;
 
 	printf("receiving data!\n");
 
 
 	while(!end)
 	{
-		packet_num++;
         random_num = rand() % 1000; // random number between 0 and 999
         int error_range = (int)(ERROR_PROBABILITY * 1000);
         if (random_num < error_range) {                                                           // assume error / corrupt packet
@@ -97,7 +95,7 @@ void str_ser(int sockfd)
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("NACK sent by server to client, packet %d\n", packet_num);
+            printf("NACK sent by server to client\n");
         } 
 
         else 
@@ -107,6 +105,7 @@ void str_ser(int sockfd)
                 printf("error when receiving\n");
                 exit(1);
             }
+
             if (recvs[n-1] == '\0')									//if it is the end of the file
             {
                 end = 1;
@@ -114,7 +113,6 @@ void str_ser(int sockfd)
             }
             memcpy((buf+lseek), recvs, n); // receive the uncorrupt packet and store in dest
             lseek += n;
-
             // for stop and wait ARQ, receiver (server) sends ack after successfully receiving each frame
             ack.num = 1; 
             ack.len = 0;
@@ -123,7 +121,7 @@ void str_ser(int sockfd)
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("ACK sent by server to client, packet %d\n", packet_num);
+            printf("ACK sent by server to client\n");
         }
 	}
 	
@@ -136,3 +134,4 @@ void str_ser(int sockfd)
 	fclose(fp);
 	printf("a file has been successfully received!\nthe total data received is %d bytes\n", (int)lseek);
 }
+

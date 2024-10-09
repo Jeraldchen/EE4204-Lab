@@ -85,9 +85,10 @@ float str_cli(FILE *fp, int sockfd, long *len)
 	float time_inv = 0.0;
 	struct timeval sendt, recvt;
 	ci = 0;
-    //int ACK_count = 0;
-	int NACK_count = 0;
-	int packet_count = 0;
+
+	struct ack_so termination_packet;
+	termination_packet.num = 3; // Use a special number to signify termination
+	termination_packet.len = 0; // No data, just the flag
 
 	fseek (fp , 0 , SEEK_END);
 	lsize = ftell (fp);
@@ -96,7 +97,7 @@ float str_cli(FILE *fp, int sockfd, long *len)
 	printf("the packet length is %d bytes\n",DATALEN);
 
 // allocate memory to contain the whole file.
-	buf = (char *) malloc (lsize);
+	buf = (char *) malloc (lsize+1);
 	if (buf == NULL) exit (2);
 
   // copy the file into the buffer.
@@ -113,32 +114,32 @@ float str_cli(FILE *fp, int sockfd, long *len)
 			slen = DATALEN;
 		memcpy(sends, (buf+ci), slen);
 
-		while(1) {
-			n = send(sockfd, &sends, slen, 0); //send the data
-			if(n == -1) { // check if there is any error when sending
-				printf("send error!");								
-				exit(1);
-			}
-
-			packet_count++;
-			if ((n= recv(sockfd, &ack, 2, 0))==-1)                                   //receive the ack
-			{
-				printf("error when receiving\n");
-				exit(1);
-			}
-
-			if (ack.num == 1 && ack.len == 0) {
-				//ACK_count++;
-				ci += slen;
-				printf("ACK received for packet %d\n", packet_count);
-				break;
-			} else if (ack.num == 2) {
-				NACK_count++;
-				printf("NACK received for packet %d\n", packet_count);
-			} 
+		
+		n = send(sockfd, &sends, slen, 0); //send the data
+		if(n == -1) { // check if there is any error when sending
+			printf("send error!");								
+			exit(1);
 		}
+
+		if ((n= recv(sockfd, &ack, 2, 0))==-1)                                   //receive the ack
+		{
+			printf("error when receiving\n");
+			exit(1);
+		}
+
+		if (ack.num == 1 && ack.len == 0) {
+			ci += slen; // transmit next frame only if ACK
+			printf("ACK received\n");
+			
+		} else if (ack.num == 2 && ack.len == 0) {
+			printf("NACK received\n");
+			continue;
+		} else {
+			printf("Error in transmission\n");
+			continue;
+		}
+		
 	}
-	printf("Total NACK: %d\n", NACK_count);
 
 	gettimeofday(&recvt, NULL);
 	*len= ci;                                                         //get current time
