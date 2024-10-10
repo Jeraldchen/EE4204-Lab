@@ -86,6 +86,8 @@ float str_cli(FILE *fp, int sockfd, long *len)
 	struct timeval sendt, recvt;
 	ci = 0;
 	int packet_count = 0;
+	int ack_count = 0;
+	int nack_count = 0;
 
 	fseek (fp , 0 , SEEK_END);
 	lsize = ftell (fp);
@@ -128,9 +130,11 @@ float str_cli(FILE *fp, int sockfd, long *len)
 
 		if (ack.num == 1 && ack.len == 0) {
 			ci += slen; // transmit next frame only if ACK
+			ack_count++;
 			printf("ACK received\n");
 			
 		} else if (ack.num == 2 && ack.len == 0) {
+			nack_count++;
 			printf("NACK received\n");
 			continue;
 		} else {
@@ -139,6 +143,11 @@ float str_cli(FILE *fp, int sockfd, long *len)
 		}
 		
 	}
+
+	printf("\n");
+	printf("Total NACKs received: %d\n", nack_count);
+	printf("Total ACKs received: %d\n", ack_count);
+	printf("\n");
 
 	gettimeofday(&recvt, NULL);
 	*len= ci;                                                         //get current time

@@ -20,7 +20,7 @@
 #define BUFSIZE 60000
 #define PACKLEN (DATALEN + HEADLEN)
 #define HEADLEN 8
-#define ERROR_PROBABILITY 0.0 // Alternate between 0.0 and 0.40
+#define ERROR_PROBABILITY 0.0// Alternate between 0.0 and 0.40
 
 struct pack_so			//data packet structure
 {

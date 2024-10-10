@@ -79,6 +79,7 @@ void str_ser(int sockfd)
 	end = 0;
     int random_num = 0;
 	int ACK_count = 0;
+	int NACK_count = 0;
 	srand(time(0));
 
 	printf("receiving data!\n");
@@ -86,9 +87,16 @@ void str_ser(int sockfd)
 
 	while(!end)
 	{
+		if ((n= recv(sockfd, &recvs, DATALEN, 0))==-1)                                   //receive the packet
+		{
+			printf("error when receiving\n");
+			exit(1);
+		}        
         random_num = rand() % 1000; // random number between 0 and 999
         int error_range = (int)(ERROR_PROBABILITY * 1000);
-        if (random_num < error_range) {                                                           // assume error / corrupt packet
+        if (random_num < error_range) {    
+	        // assume error / corrupt packet
+			NACK_count++;
             ack.num = 2; // nack
             ack.len = 0;
             if ((n = send(sockfd, &ack, 2, 0))==-1)
@@ -101,12 +109,6 @@ void str_ser(int sockfd)
 
         else 
         {
-            if ((n= recv(sockfd, &recvs, DATALEN, 0))==-1)                                   //receive the packet
-            {
-                printf("error when receiving\n");
-                exit(1);
-            }
-
 			ACK_count++;
 
             if (recvs[n-1] == '\0')									//if it is the end of the file
@@ -124,9 +126,15 @@ void str_ser(int sockfd)
                 printf("send error!");								//send the ack
                 exit(1);
             }
-            printf("ACK sent by server to client, %d\n", ACK_count);
+            printf("ACK sent by server to client, for packet %d\n", ACK_count);
         }
+	
 	}
+
+	printf("\n");
+	printf("Total NACKs sent by server: %d\n", NACK_count);
+	printf("Total ACKs sent by server: %d\n", ACK_count);
+	printf("\n");
 	
 	if ((fp = fopen ("myTCPreceive.txt","wt")) == NULL)
 	{
