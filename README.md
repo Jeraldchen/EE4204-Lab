@@ -1,4 +1,4 @@
-This is a Stop and Wait Automatic Repeat reQuest (ARQ) lab assignment using Transmission Control Protocol (TCP) from NUS EE4204 in Ay24/25 Semester 1.
+This is a Stop and Wait Automatic Repeat reQuest (ARQ) lab assignment using Transmission Control Protocol (TCP) from NUS EE4204 in AY24/25 Semester 1.
 
 Steps to run the codes:
 
